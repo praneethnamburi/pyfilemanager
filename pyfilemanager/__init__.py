@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import os
 import fnmatch
 from pathlib import Path
-
 from typing import Union
+
 
 class FileManager:
     """

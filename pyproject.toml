@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "pyfilemanager"
+version = "0.1.0"
+description = "Easy to use file search and file path management in python."
+authors = ["Praneeth Namburi <praneeth.namburi@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.urls]
+"Homepage" = "https://github.com/praneethnamburi/pyfilemanager"
+"Bug Tracker" = "https://github.com/praneethnamburi/pyfilemanager/issues"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -21,6 +21,7 @@ video_list = FileManager(r'C:\videos').add('video', '*.avi', include=['sony', 'p
 ### Long version
 Consider the following file structure in C:\videos directory
 
+```
 C:\videos
 ├── sony
 │   ├── 142Camera.avi
@@ -40,6 +41,7 @@ C:\videos
 ├── notes
 │   ├── notes1.txt
 │   ├── notes2.txt
+```
 
 1. Initialize the file manager.
    ```python

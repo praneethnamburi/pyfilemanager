@@ -45,6 +45,10 @@ C:\videos
 │   ├── notes2.txt
 ```
 
+0. Import the FileManager class.
+   ```python
+   from pyfilemanager import FileManager
+   ```
 1. Initialize the file manager.
    ```python
    fm = FileManager(r'C:\videos', exclude_hidden=True)
@@ -76,7 +80,18 @@ C:\videos
     ```
 3. Retrieve file paths using a dict-like convention.
    ```python
-    canon_videos = fm['canon']
+    fm['canon']
+    # Retrieve by the tag 'canon'
+    # Returns canon/40Camera.avi and canon/51Camera.avi
+
+    fm['143Camera']
+    # When a tag is not found, retrieve file paths by the stem. 
+    # Returns panasonic/143Camera.avi and sony/143Camera.avi
+
+    fm['20']
+    # If the key doesn't match a tag or a stem of a filename, do a loose-search to retrieve all entries where the tag is anywhere in the full path.
+    # Returns panasonic2/201Camera.avi and panasonic2/202.mp4
+
     all_videos = fm['videos']
     ```
 4. Add and retrieve in one line of code. 
@@ -97,6 +112,13 @@ C:\videos
    ```python
     fm.report()
     ```
+    ```console
+    2 canon files taking up 0.000 MB
+    1 sony42 files taking up 0.000 MB
+    8 videos files taking up 0.000 MB
+    2 panasonic files taking up 0.000 MB
+    5 txt files taking up 0.000 MB
+    ```
 
 ## License
 
@@ -112,5 +134,4 @@ Project Link: [https://github.com/praneethnamburi/pyfilemanager](https://github.
 
 ## Acknowledgments
 
-This tool was developed as part of the ImmersionToolbox initiative at the MIT.nano Immersion Lab, and thanks to NCSOFT for supporting this initiative.
-
+This tool was developed as part of the ImmersionToolbox initiative at the [MIT.nano Immersion Lab](https://immersion.mit.edu). Thanks to NCSOFT for supporting this initiative.

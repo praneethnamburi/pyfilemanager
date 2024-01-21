@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyfilemanager"
-version = "0.1.0"
+version = "0.1.1"
 description = "Easy to use file search and file path management in python."
 authors = ["Praneeth Namburi <praneeth.namburi@gmail.com>"]
 license = "MIT"

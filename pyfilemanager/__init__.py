@@ -19,13 +19,13 @@ class FileManager:
 
     Attributes:
         base_dir (str): base directory for file search
-        all_files (list): Return a list of all file paths managed by the filemanager. Remove duplicates.
 
         _files (dict): {Tag: List of file paths}
         _filters (dict): {Tag: pattern list}
         _inclusions (dict): {Tag: inclusion criteria}
         _exclusions (dict): {Tag: exclusion criteria}
-        
+    
+    IGNORE:
     Methods:
         add: Add files based on different inclusion and exclusion criteria.
         get_tags: Return a list of tags created using the add method.
@@ -35,6 +35,7 @@ class FileManager:
 
         _find: Core method for finding files based on os.walk and fnmatch.
         _include, _exclude: Utilities used by the add method.
+    IGNORE
     """    
     def __init__(self, base_dir: str, exclude_hidden: bool=True):
         assert isinstance(base_dir, str)
@@ -50,7 +51,7 @@ class FileManager:
         """Add files based on different inclusion and exclusion criteria.
 
         Example:
-            fm.add('video', '*Camera*.avi')
+            ``fm.add('video', '*Camera*.avi')``
 
         Args:
             tag (str): e.g. 'video_files'
@@ -60,7 +61,7 @@ class FileManager:
             exclude_hidden (bool, optional): Set the state for excluding hidden files. Defaults to the value of _exclude_hidden attribute, which defaults to True.
 
         Returns:
-            FileManager: Eeturns self. Useful for chaining commands.
+            FileManager: Returns self. Useful for chaining commands.
         """
         if exclude_hidden is None: # None means not specified. In this case, set it to the global default.
             exclude_hidden = self._exclude_hidden
@@ -137,9 +138,11 @@ class FileManager:
 
     def __getitem__(self, key: str) -> list:
         """Retrieve file paths based on - 
+
             (1) tag
             (2) exact match for the 'stem' of the file
             (3) key is anywhere in the path 
+
             Try (2) only if (1) doesn't return any results, and try (3) only if (2) doesn't return any results.
 
         Args:
@@ -196,10 +199,10 @@ class FileManager:
     
     @staticmethod
     def _find(pattern: str, path: str=None, exclude_hidden: bool=True) -> list:
-        """Core method for finding files based on os.walk and fnmatch.
+        """Core method for finding files based on ``os.walk`` and ``fnmatch``.
 
         Example:
-            find('*.txt', '/path/to/dir')
+            ``FileManager._find('*.txt', '/path/to/dir')``
 
         Args:
             pattern (str): Input for fnmatch.

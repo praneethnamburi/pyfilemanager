@@ -11,7 +11,7 @@
 :caption: 'Contents:'
 :maxdepth: 2
 
-FileManager
+api
 ```
 
 <!-- # Indices and tables

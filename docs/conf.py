@@ -9,7 +9,7 @@
 project = 'pyfilemanager'
 copyright = '2024, Praneeth Namburi'
 author = 'Praneeth Namburi'
-release = '0.1.1'
+release = '0.2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

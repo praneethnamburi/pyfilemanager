@@ -38,7 +38,7 @@ class FileManager:
     IGNORE
     """    
     def __init__(self, base_dir: str, exclude_hidden: bool=True):
-        assert isinstance(base_dir, str)
+        assert isinstance(base_dir, (str, Path))
         self.base_dir = os.path.realpath(base_dir)
         self._files = {}
         self._filters = {}

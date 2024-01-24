@@ -92,14 +92,12 @@ C:\videos
     # Returns canon/40Camera.avi and canon/51Camera.avi
 
     fm['143Camera']
-    # When a tag is not found, retrieve file paths by the stem. 
+    # When a tag is not found, retrieve file paths by an exact match to the file stem.
     # Returns panasonic/143Camera.avi and sony/143Camera.avi
 
     fm['20']
     # If the key doesn't match a tag or a stem of a filename, do a loose-search to retrieve all entries where the tag is anywhere in the full path.
     # Returns panasonic2/201Camera.avi and panasonic2/202.mp4
-
-    all_videos = fm['videos']
     ```
 4. Add and retrieve in one line of code. 
    ```python
@@ -109,7 +107,7 @@ C:\videos
 5. Retrieve all the added keys using fm.**get_tags**()
    ```python
    fm.get_tags()
-   # returns a tuple ('canon', 'sony42', 'videos', 'panasonic', 'notes')
+   # returns a list ['canon', 'sony42', 'videos', 'panasonic', 'notes']
    ```
 6. Retrieve paths of all the added files.
    ```python

@@ -11,6 +11,7 @@ python = "^3.7"
 
 [tool.poetry.urls]
 "Homepage" = "https://github.com/praneethnamburi/pyfilemanager"
+"Documentation" = "https://pyfilemanager.readthedocs.io"
 "Bug Tracker" = "https://github.com/praneethnamburi/pyfilemanager/issues"
 
 [build-system]

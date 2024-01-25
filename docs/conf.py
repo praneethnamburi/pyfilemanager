@@ -9,7 +9,7 @@
 project = 'pyfilemanager'
 copyright = '2024, Praneeth Namburi'
 author = 'Praneeth Namburi'
-release = '0.2.0'
+release = '0.3.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -35,6 +35,7 @@ html_theme_options = {
 html_static_path = ['_static']
 
 autodoc_member_order = 'bysource'
+napoleon_use_ivar = True
 
 from sphinx.ext.autodoc import between
 

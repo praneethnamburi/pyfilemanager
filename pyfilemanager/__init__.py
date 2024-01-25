@@ -33,7 +33,6 @@ class FileManager:
         remove: Remove file paths stored under a given tag. May not be very useful.
         __getitem__: overloaded.
 
-        _find: Core method for finding files based on os.walk and fnmatch.
         _include, _exclude: Utilities used by the add method.
     IGNORE
     """    
@@ -72,7 +71,7 @@ class FileManager:
         self._files[tag] = []
         
         for pattern in pattern_list:
-            self._files[tag] += self._find(pattern, path=self.base_dir, exclude_hidden=exclude_hidden)
+            self._files[tag] += find(pattern, path=self.base_dir, exclude_hidden=exclude_hidden)
         
         self._filters[tag] = pattern_list
         self._inclusions[tag] = []
@@ -194,57 +193,8 @@ class FileManager:
             units (str, optional): One of ('B', 'KB', 'MB', 'GB', 'TB). B is for bytes. Defaults to 'MB'.
         """        
         for file_type, file_list in self._files.items():
-            fs = sum(list(self._file_size(file_list, units=units).values()))
+            fs = sum(list(get_file_sizes(file_list, units=units).values()))
             print(str(len(file_list)) + ' ' + file_type + ' files taking up {:4.3f} '.format(fs) + units)
-    
-    @staticmethod
-    def _find(pattern: str, path: str=None, exclude_hidden: bool=True) -> list:
-        """Core method for finding files based on ``os.walk`` and ``fnmatch``.
-
-        Example:
-            ``FileManager._find('*.txt', '/path/to/dir')``
-
-        Args:
-            pattern (str): Input for fnmatch.
-            path (str, optional): Search for files in this path. Defaults to the results of os.getcwd().
-            exclude_hidden (bool, optional): Whether to include filenames of hidden files. Defaults to True.
-
-        Returns:
-            list: List of file names.
-        """
-        if path is None:
-            path = os.getcwd()
-        
-        # this bit is from stack overflow
-        result = []
-        for root, _, files in os.walk(path):
-            for name in files:
-                if fnmatch.fnmatch(name, pattern):
-                    result.append(os.path.join(root, name))
-
-        if exclude_hidden:
-            return [r for r in result if not (r.split(os.sep)[-1].startswith('~$') or r.split(os.sep)[-1].startswith('.'))]
-        return result
-    
-    @staticmethod
-    def _file_size(file_list: list, units: str='MB') -> dict:
-        """Returns files sizes in descending order (default: megabytes). Used by the report method.
-
-        Args:
-            file_list (list): list of file names
-            units (str, optional): One of ('B', 'KB', 'MB', 'GB', 'TB). B is for bytes. Defaults to 'MB'.
-
-        Returns:
-            dict: {file_name : size}
-        """
-        div = {'B':1, 'KB':1024, 'MB':1024**2, 'GB':1024**3, 'TB':1024**4}
-        if isinstance(file_list, str):
-            file_list = [file_list]
-        assert isinstance(file_list, list)
-        size_mb = {os.path.getsize(f)/div[units]:f for f in file_list} # {size: file_name}
-        size_list = list(size_mb.keys())
-        size_list.sort(reverse=True)
-        return {size_mb[s]:s for s in size_list} # {file_name : size}
     
     @staticmethod
     def _unique_sorted(file_list: list) -> list:
@@ -259,4 +209,52 @@ class FileManager:
         ret = list(set(file_list))
         ret.sort()
         return ret
+
+
+def find(pattern: str, path: str=None, exclude_hidden: bool=True) -> list:
+    """Core function for finding files based on ``os.walk`` and ``fnmatch``.
+
+    Example:
+        ``find('*.txt', r'C:\\videos')``
+
+    Args:
+        pattern (str): Input for fnmatch.
+        path (str, optional): Search for files in this path. Defaults to the results of os.getcwd().
+        exclude_hidden (bool, optional): Whether to include filenames of hidden files. Defaults to True.
+
+    Returns:
+        list: List of file names.
+    """
+    if path is None:
+        path = os.getcwd()
     
+    # this bit is from stack overflow
+    result = []
+    for root, _, files in os.walk(path):
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                result.append(os.path.join(root, name))
+
+    if exclude_hidden:
+        return [r for r in result if not (r.split(os.sep)[-1].startswith('~$') or r.split(os.sep)[-1].startswith('.'))]
+    return result
+
+
+def get_file_sizes(file_list: list, units: str='MB') -> dict:
+    """Returns files sizes in descending order (default: megabytes). Used by the FileManager.report method.
+
+    Args:
+        file_list (list): list of file names
+        units (str, optional): One of ('B', 'KB', 'MB', 'GB', 'TB). B is for bytes. Defaults to 'MB'.
+
+    Returns:
+        dict: {file_name : size}
+    """
+    div = {'B':1, 'KB':1024, 'MB':1024**2, 'GB':1024**3, 'TB':1024**4}
+    if isinstance(file_list, str):
+        file_list = [file_list]
+    assert isinstance(file_list, list)
+    size_mb = {os.path.getsize(f)/div[units]:f for f in file_list} # {size: file_name}
+    size_list = list(size_mb.keys())
+    size_list.sort(reverse=True)
+    return {size_mb[s]:s for s in size_list} # {file_name : size}

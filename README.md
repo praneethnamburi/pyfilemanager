@@ -1,8 +1,10 @@
 # pyfilemanager
 
-![Supported Python Versions](https://img.shields.io/static/v1?label=python&message=>=3.7&color=green)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/praneethnamburi/pyfilemanager/main/LICENSE)
+[![src](https://img.shields.io/badge/src-github-blue)](https://github.com/praneethnamburi/pyfilemanager)
+[![PyPI - Version](https://img.shields.io/pypi/v/pyfilemanager.svg?logo=pypi&label=PyPI&logoColor=gold)](https://pypi.org/project/pyfilemanager/)
 [![Documentation Status](https://readthedocs.org/projects/pyfilemanager/badge/?version=latest)](https://pyfilemanager.readthedocs.io)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/praneethnamburi/pyfilemanager/main/LICENSE)
+
 
 *Easy to use file search and file path management in python.*
 

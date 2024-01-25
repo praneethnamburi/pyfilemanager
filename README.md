@@ -1,7 +1,7 @@
 # pyfilemanager
 
 ![Supported Python Versions](https://img.shields.io/static/v1?label=python&message=>=3.7&color=green)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/vintasoftware/datagun/master/LICENSE)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/praneethnamburi/pyfilemanager/main/LICENSE)
 [![Documentation Status](https://readthedocs.org/projects/pyfilemanager/badge/?version=latest)](https://pyfilemanager.readthedocs.io)
 <!-- [![PyPI Downloads](https://img.shields.io/pypi/dw/pyfilemanager.svg?label=PyPI%20downloads)](
 https://pypi.org/project/pyfilemanager/)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import fnmatch
 from pathlib import Path
-from typing import Union
+from typing import Union, Iterable
 
 
 class FileManager:
@@ -138,18 +138,29 @@ class FileManager:
     def __getitem__(self, key: str) -> list:
         """Retrieve file paths based on - 
 
+            (0) `FileManager.filter` method if key has special chacters such as *, ?, !, [] 
             (1) tag
             (2) exact match for the 'stem' of the file
             (3) key is anywhere in the path 
 
-            Try (2) only if (1) doesn't return any results, and try (3) only if (2) doesn't return any results.
+            Try (0) if there are special characters in `key`. 
+            If not, try (2) only if (1) doesn't return any results,
+            and try (3) only if (2) doesn't return any results.
 
         Args:
             key (str): Either a tag, filename, or partial match.
 
         Returns:
             list: List of file paths.
-        """        
+        """
+        def has_special_characters(inp: str, spc: Iterable[str]=('*', '?', '[', '!')):
+            return any([s in inp for s in spc])
+        
+        # (0) filter using fnmatch.filter when there are special characters in the key
+        if has_special_characters(key):
+            # prepend a * to the key because the intention is to act on full file paths
+            return self.filter(f'*{key}') # notes*.txt will return notes1.txt and notes2.txt
+        
         # (1) by tag
         if key in self._files:
             return self._files[key]
@@ -164,7 +175,17 @@ class FileManager:
         
         # (3) loose search - full path contains
         return self._unique_sorted([x for x in all_files if key in x])
-        
+    
+    def filter(self, pattern: str) -> list:
+        """Filter self.all_files using `fnmatch.filter`.
+
+        Args:
+            pattern (str): e.g. *.avi, *notes?.txt
+
+        Returns:
+            list: List of file paths.
+        """        
+        return fnmatch.filter(self.all_files, pattern)
     
     def get_tags(self) -> list:
         """Return a list of tags created using the add method.

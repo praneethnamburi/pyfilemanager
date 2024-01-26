@@ -97,6 +97,10 @@ C:\videos
     fm['20']
     # If the key doesn't match a tag or a stem of a filename, do a loose-search to retrieve all entries where the tag is anywhere in the full path.
     # Returns panasonic2/201Camera.avi and panasonic2/202.mp4
+
+    fm['notes?.txt']
+    # Search for files using special chracters *, ?, !, [] specified in fnmatch
+    # Returns notes/notes1.txt and notes/notes2.txt
     ```
 4. Add and retrieve in one line of code. 
    ```python

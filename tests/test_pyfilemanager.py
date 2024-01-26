@@ -65,6 +65,9 @@ def test_getitem(tmp_path_factory):
     fm = FileManager(tmp_path_factory.getbasetemp())
     fm.add('canon', '*Camera.avi', include='canon')
     fm.add('videos', ['*.avi', '*.mp4'])
+    fm.add('notes', 'notes*.txt')
+    # Retrieve using special characters
+    assert _relative_paths(fm['*notes?.txt']) == {'notes/notes1.txt', 'notes/notes2.txt'}
     # Retrieve by the tag 'canon'
     assert _relative_paths(fm['canon']) == {'canon/40Camera.avi', 'canon/51Camera.avi'}
     # When a tag is not found, retrieve file paths by an exact match to the file stem.

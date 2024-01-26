@@ -61,8 +61,16 @@ C:\videos
    ```
 2. Add files based on different inclusion and exclusion criteria. Use the include parameter to keep file paths that contain **all** of the supplied strings *anywhere* in the file path. Use the exclude parameter to disregard file paths that contain **any** of the supplied string anywhere in the file path.
    ```python
+    fm.add()
+    # add all files in the directory under the tag 'all'
+    # achieves the same result as fm.add('all') and fm.add('*.*')
+
+    fm.add('*.avi')
+    # add all files with extension .avi under the tag 'avi'
+    # this is short for fm.add('avi', '*.avi'), and only works for patterns that start with *.
+
     fm.add('canon', '*Camera.avi', include='canon')
-    # file path must contain canon
+    # include=canon means that file path must contain canon
 
     fm.add('sony42', '*Camera.avi', include=['sony', '42'])
     # file path must contain sony AND 42

@@ -1,3 +1,10 @@
+"""Easy to use file search and file path management.
+
+:py:class:`FileManager` class initializes file path management in the directory of interest.
+:py:meth:`FileManager.add` is used to tag a set of file paths filtered based on different inclusion and exclusion criteria.
+:py:meth:`FileManager.__getitem__` is used to retrieve file paths of interest based on a tag, filename, or pattern.
+:py:func:`find` is the core function for finding files, and it is based on `os.walk` and `fnmatch`.
+"""
 from __future__ import annotations
 
 import os
@@ -5,6 +12,8 @@ import fnmatch
 from pathlib import Path
 from typing import Union, Iterable
 
+__version__ = '1.0.0'
+__all__ = ["FileManager", "find"]
 
 class FileManager:
     """
@@ -52,7 +61,10 @@ class FileManager:
         Note that if a tag already exists, it will get overwritten with the new 
 
         Examples:
-            ``fm.add('video', '*Camera*.avi')``
+            Add files that match the pattern *Camera*.avi under the tag `video`\n
+            ``fm.add('video', '*Camera*.avi')`` 
+
+            Add all files under the tag `all` (special case)\n
             ``fm = FileManager(r'C:\\videos').add()``
 
         Args:

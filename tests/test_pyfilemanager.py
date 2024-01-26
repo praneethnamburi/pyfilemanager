@@ -28,6 +28,23 @@ def test_folder_initializer(tmp_path_factory):
     assert len(fm.all_files) == 13
 
 
+def test_add_special(tmp_path_factory):
+    fm = FileManager(tmp_path_factory.getbasetemp())
+    fm.add()
+    assert fm.add() is fm
+    assert len(fm.all_files) == 13
+    assert fm.get_tags() == ['all']
+    fm.remove('all')
+    assert len(fm.all_files) == 0
+    fm.add('*.*')
+    assert len(fm.all_files) == 13
+    assert fm.get_tags() == ['all']
+    fm.add('*.avi')
+    assert fm.get_tags() == ['all', 'avi']
+    assert len(fm['avi']) == 7
+    with pytest.raises(AssertionError):
+        fm.add('*.a?2')
+
 def test_add_pattern(tmp_path_factory):
     fm = FileManager(tmp_path_factory.getbasetemp())
     fm.add('mp4', '*.mp4') # pattern: str

@@ -46,15 +46,18 @@ class FileManager:
         assert isinstance(exclude_hidden, bool)
         self._exclude_hidden = exclude_hidden
     
-    def add(self, tag: str, pattern_list: Union[str,list], include: Union[str,list]=None, exclude: Union[str,list]=None, exclude_hidden: bool=None) -> FileManager:
+    def add(self, tag: str='all', pattern_list: Union[str,list]=None, include: Union[str,list]=None, exclude: Union[str,list]=None, exclude_hidden: bool=None) -> FileManager:
         """Add files based on different inclusion and exclusion criteria.
+        Call this method without any arguments to work with all the files in the directory using `FileManager.__getitem__`.
+        Note that if a tag already exists, it will get overwritten with the new 
 
-        Example:
+        Examples:
             ``fm.add('video', '*Camera*.avi')``
+            ``fm = FileManager(r'C:\\videos').add()``
 
         Args:
-            tag (str): e.g. 'video_files'
-            pattern_list (Union[str,list]): e.g. '*.avi', ['*.avi', '*.mp4']
+            tag (str, optional): e.g. 'video_files'. Defaults to all, meaning add all files in the directory recursively.
+            pattern_list (Union[str,list], optional): e.g. '*.avi', ['*.avi', '*.mp4']. Defaults to *.*
             include (Union[str,list], optional): Keep file paths that contain **all** of the supplied strings *anywhere* in the file path. Defaults to None.
             exclude (Union[str,list], optional): Disregard file paths that contain **any** of the supplied string anywhere in the file path. Defaults to None.
             exclude_hidden (bool, optional): Set the state for excluding hidden files. Defaults to the value of _exclude_hidden attribute, which defaults to True.
@@ -62,6 +65,18 @@ class FileManager:
         Returns:
             FileManager: Returns self. Useful for chaining commands.
         """
+        if pattern_list is None:
+            assert tag == 'all' or tag.startswith('*.')
+            if tag == 'all':
+                pattern_list = '*.*'
+            elif tag == '*.*':
+                pattern_list = tag
+                tag = 'all'
+            else:
+                pattern_list = tag
+                tag = tag[2:]
+                assert not self._has_special_characters(tag)
+
         if exclude_hidden is None: # None means not specified. In this case, set it to the global default.
             exclude_hidden = self._exclude_hidden
         
@@ -153,11 +168,8 @@ class FileManager:
         Returns:
             list: List of file paths.
         """
-        def has_special_characters(inp: str, spc: Iterable[str]=('*', '?', '[', '!')):
-            return any([s in inp for s in spc])
-        
         # (0) filter using fnmatch.filter when there are special characters in the key
-        if has_special_characters(key):
+        if self._has_special_characters(key):
             # prepend a * to the key because the intention is to act on full file paths
             return self.filter(f'*{key}') # notes*.txt will return notes1.txt and notes2.txt
         
@@ -230,6 +242,19 @@ class FileManager:
         ret = list(set(file_list))
         ret.sort()
         return ret
+
+    @staticmethod
+    def _has_special_characters(inp: str, spc: Iterable[str]=('*', '?', '[', '!')) -> bool:
+        """Helper function to deal with special use-cases of `FileManager.add` and `FileManager.__getitem__` methods.
+
+        Args:
+            inp (str): e.g. *notes, avi
+            spc (Iterable[str], optional): Described in `fnmatch.fnmatch`. Defaults to ('*', '?', '[', '!').
+
+        Returns:
+            bool: True if any of the special characters are in `inp`
+        """
+        return any([s in inp for s in spc])
 
 
 def find(pattern: str, path: str=None, exclude_hidden: bool=True) -> list:

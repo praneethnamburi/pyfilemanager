@@ -7,10 +7,10 @@
 """
 from __future__ import annotations
 
-import os
 import fnmatch
+import os
 from pathlib import Path
-from typing import Union, Iterable
+from typing import Iterable, Union
 
 __version__ = "1.0.0"
 __all__ = ["FileManager", "find"]

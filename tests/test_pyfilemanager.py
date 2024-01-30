@@ -1,5 +1,7 @@
 from pathlib import Path
+
 import pytest
+
 import pyfilemanager
 from pyfilemanager import FileManager
 

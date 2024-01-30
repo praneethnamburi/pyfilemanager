@@ -19,7 +19,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.duration',
     'sphinx.ext.autosectionlabel',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
     'sphinxcontrib.youtube',
 ]
 
@@ -33,7 +33,7 @@ html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
     'collapse_navigation': False,
 }
-html_static_path = ['_static']
+html_static_path = []
 
 autodoc_member_order = 'bysource'
 napoleon_use_ivar = True

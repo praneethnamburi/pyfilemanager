@@ -1,5 +1,6 @@
 from pathlib import Path
 import pytest
+import pyfilemanager
 from pyfilemanager import FileManager
 
 @pytest.fixture(scope='session', autouse=True)
@@ -10,7 +11,7 @@ def initialize_folder_structure(tmp_path_factory):
         'panasonic': ['151Camera.avi', '143Camera.avi', 'notes.txt'], 
         'panasonic2': ['201Camera.avi', '202.mp4'],
         'canon': ['51Camera.avi', '40Camera.avi', 'notes.txt'], 
-        'notes': ['notes1.txt', 'notes2.txt']
+        'notes': ['notes1.txt', 'notes2.txt', '.notes.txt']
         }
     for folder_name, file_names in folder_structure.items():
         this_folder = root_dir_files / folder_name
@@ -28,7 +29,7 @@ def test_folder_initializer(tmp_path_factory):
     assert len(fm.all_files) == 13
 
 
-def test_add_special(tmp_path_factory):
+def test_add_special_remove(tmp_path_factory):
     fm = FileManager(tmp_path_factory.getbasetemp())
     fm.add()
     assert fm.add() is fm
@@ -44,6 +45,8 @@ def test_add_special(tmp_path_factory):
     assert len(fm['avi']) == 7
     with pytest.raises(AssertionError):
         fm.add('*.a?2')
+    with pytest.raises(ValueError):
+        fm.remove('this_key_does_not_exist')
 
 def test_add_pattern(tmp_path_factory):
     fm = FileManager(tmp_path_factory.getbasetemp())
@@ -121,3 +124,14 @@ def test_report(tmp_path_factory, capsys):
     captured = capsys.readouterr()
     assert [' '.join(x.split(' ')[:2]) for x in captured.out.splitlines()] == ['2 canon', '1 sony42', '8 videos', '2 panasonic', '2 notes']
     # assert captured.out == '2 canon files taking up 0.000 MB\n1 sony42 files taking up 0.000 MB\n8 videos files taking up 0.000 MB\n2 panasonic files taking up 0.000 MB\n2 notes files taking up 0.000 MB\n'
+
+def test_find(tmp_path_factory):
+    path = tmp_path_factory.getbasetemp()
+    assert _relative_paths(pyfilemanager.find('notes1.txt', path=path)) == {'notes/notes1.txt'}
+    assert _relative_paths(pyfilemanager.find('abc.def')) == set() # test case when path=None, not sure if this is a good test
+    assert len(pyfilemanager.find('*.*', path=path, exclude_hidden=True)) == 13
+    assert len(pyfilemanager.find('*.*', path=path, exclude_hidden=False)) > 13
+
+def test_get_file_sizes(tmp_path_factory):
+    fname = Path(tmp_path_factory.getbasetemp()) / 'notes' / 'notes1.txt'
+    assert list(pyfilemanager.get_file_sizes(str(fname)).values())[0] == 0 # testing when file_list is a string

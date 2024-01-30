@@ -295,6 +295,7 @@ def find(pattern: str, path: str=None, exclude_hidden: bool=True) -> list:
 
     if exclude_hidden:
         return [r for r in result if not (r.split(os.sep)[-1].startswith('~$') or r.split(os.sep)[-1].startswith('.'))]
+    
     return result
 
 

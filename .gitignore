@@ -4,3 +4,4 @@ dist/
 examplefolder/
 docs/_build
 *.egg-info/
+.coverage

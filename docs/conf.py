@@ -20,6 +20,7 @@ extensions = [
     'sphinx.ext.duration',
     'sphinx.ext.autosectionlabel',
     'sphinxcontrib.napoleon',
+    'sphinxcontrib.youtube',
 ]
 
 templates_path = ['_templates']

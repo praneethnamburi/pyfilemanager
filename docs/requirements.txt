@@ -3,3 +3,4 @@ sphinx-rtd-theme==2.0.0
 sphinxcontrib-napoleon==0.7
 rst-to-myst==0.4.0
 myst-parser==1.0.0
+sphinxcontrib-youtube==1.3.0

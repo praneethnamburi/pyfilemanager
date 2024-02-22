@@ -10,7 +10,7 @@ from __future__ import annotations
 import fnmatch
 import os
 from pathlib import Path
-from typing import Iterable, Union
+from typing import Iterable, Union, Callable, Mapping
 
 __version__ = "1.0.0"
 __all__ = ["FileManager", "find"]
@@ -60,9 +60,9 @@ class FileManager:
     def add(
         self,
         tag: str = "all",
-        pattern_list: Union[str, list] = None,
-        include: Union[str, list] = None,
-        exclude: Union[str, list] = None,
+        pattern_list: Union[str, list[str]] = None,
+        include: Union[str, list[str]] = None,
+        exclude: Union[str, list[str]] = None,
         exclude_hidden: bool = None,
     ) -> FileManager:
         """Add files based on different inclusion and exclusion criteria.
@@ -98,13 +98,24 @@ class FileManager:
                 tag = tag[2:]
                 assert not self._has_special_characters(tag)
 
-        if (
-            exclude_hidden is None
-        ):  # None means not specified. In this case, set it to the global default.
-            exclude_hidden = self._exclude_hidden
-
         if isinstance(pattern_list, str):
             pattern_list = [pattern_list]
+        
+        if include is None:
+            include = []
+        if isinstance(include, str):
+            include = [include]
+        assert isinstance(include, (list, tuple))
+
+        if exclude is None:
+            exclude = []
+        if isinstance(exclude, str):
+            exclude = [exclude]
+        assert isinstance(exclude, (list, tuple))
+
+        if exclude_hidden is None:
+            # None means not specified. In this case, set it to the global default.
+            exclude_hidden = self._exclude_hidden
 
         self._files[tag] = []
 
@@ -117,24 +128,45 @@ class FileManager:
         self._inclusions[tag] = []
         self._exclusions[tag] = []
 
-        if include is not None:
-            if isinstance(include, str):
-                self._include(tag, include)
-            else:
-                assert isinstance(include, (list, tuple))
-                for inc_str in include:
-                    assert isinstance(inc_str, str)
-                    self._include(tag, inc_str)
+        for inc_str in include:
+            assert isinstance(inc_str, str)
+            self._include(tag, inc_str)
 
-        if exclude is not None:
-            if isinstance(exclude, str):
-                self._exclude(tag, exclude)
-            else:
-                assert isinstance(exclude, (list, tuple))
-                for exc_str in exclude:
-                    assert isinstance(exc_str, str)
-                    self._exclude(tag, exc_str)
+        for exc_str in exclude:
+            assert isinstance(exc_str, str)
+            self._exclude(tag, exc_str)
 
+        return self  # for chaining commands
+    
+    def add_by_depth(self, max_depth: int=0, exclude_hidden: bool=None, include_directories: bool=False):
+        """Add files and directories by their depth. 
+        Tags of name files0, and directories0 will be created for files and directories at depth0.
+
+        Args:
+            max_depth (int, optional): Maximum depth for the search. Defaults to 0, adding the top level contents only.
+            exclude_hidden (bool, optional): Include or exclude hidden files and directories. 
+                Defaults to the value of self._exclude_hidden, which defaults to True.
+            include_directories (bool, optional): When set to true, one tag will be created for directories, and one for files at each depth. 
+                When set to False, only the files tag will be created at each depth. Defaults to False.
+        """        
+        if exclude_hidden is None:
+            exclude_hidden = self._exclude_hidden
+        
+        directories, files = find_by_depth(path=self.base_dir, max_depth=max_depth, exclude_hidden=exclude_hidden)
+        
+        if include_directories:
+            tag_items = dict(directories=directories, files=files)
+        else:
+            tag_items = dict(files=files)
+
+        for item_name, item in tag_items.items():
+            for depth, item_list in item.items():
+                tag = f'{item_name}{depth}'
+                self._files[tag] = item_list
+                self._filters[tag] = []
+                self._inclusions[tag] = []
+                self._exclusions[tag] = []
+        
         return self  # for chaining commands
 
     def remove(self, tag: str) -> None:
@@ -310,25 +342,62 @@ def find(pattern: str, path: str = None, exclude_hidden: bool = True) -> list:
     """
     if path is None:
         path = os.getcwd()
+    
+    _eh = _get_exclude_hidden_func(exclude_hidden)
 
-    # this bit is from stack overflow
     result = []
-    for root, _, files in os.walk(path):
-        for name in files:
-            if fnmatch.fnmatch(name, pattern):
-                result.append(os.path.join(root, name))
-
-    if exclude_hidden:
-        return [
-            r
-            for r in result
-            if not (
-                r.split(os.sep)[-1].startswith("~$")
-                or r.split(os.sep)[-1].startswith(".")
-            )
-        ]
+    for root, dirs, files in os.walk(path):
+        result += [os.path.join(root, name) for name in fnmatch.filter(_eh(files), pattern)]
+        dirs[:] = _eh(dirs)
 
     return result
+
+
+def find_by_depth(path: str, max_depth: int=0, exclude_hidden: bool=True) -> tuple[Mapping[int, list[str]], Mapping[int, list[str]]]:
+    """Get full paths to directories and files in path, organized by their depth.
+    Convenient to retrieve files in the current path without looking in the sub-directories.
+
+    Args:
+        path (str): Search for files and directories in this path.
+        max_depth (int, optional): Maximum depth for the search. Set this to -1 to search everything. 
+            But if that is the case, simply use FileManager.add without any arguments. Defaults to 0.
+        exclude_hidden (bool, optional): When true, exclude hidden files and folders from the serach. Defaults to True.
+
+    Returns:
+        tuple[Mapping[int, list[str]], Mapping[int, list[str]]]: _description_
+    """    
+    ret_dirs, ret_files = {}, {}
+
+    _eh = _get_exclude_hidden_func(exclude_hidden)
+
+    def _dirs_files_in_path(this_path):
+        _, dirs, files = next(os.walk(this_path))
+        dirs = [os.path.join(this_path, dir) for dir in _eh(dirs)]
+        files = [os.path.join(this_path, file) for file in _eh(files)]
+        return dirs, files
+    
+    ret_dirs[0], ret_files[0] = _dirs_files_in_path(path)
+
+    if max_depth == -1:
+        cond_func = lambda _: True
+    else:
+        cond_func = lambda cl: cl <= max_depth
+
+    current_level = 1
+    while cond_func(current_level):
+        if not ret_dirs[current_level-1]:
+            break
+        
+        ret_dirs[current_level], ret_files[current_level] = [], []
+        
+        for path in ret_dirs[current_level-1]:
+            dirs, files = _dirs_files_in_path(path)
+            ret_dirs[current_level] += dirs
+            ret_files[current_level] += files
+        
+        current_level += 1
+        
+    return ret_dirs, ret_files
 
 
 def get_file_sizes(file_list: list, units: str = "MB") -> dict:
@@ -351,3 +420,31 @@ def get_file_sizes(file_list: list, units: str = "MB") -> dict:
     size_list = list(size_mb.keys())
     size_list.sort(reverse=True)
     return {size_mb[s]: s for s in size_list}  # {file_name : size}
+
+
+def _exclude_hidden(name_list: list[str]) -> list[str]:
+    """Exclude names of hidden files / folders
+
+    Args:
+        name_list (list): list of strings containing just the names of the files or folder (without the path).
+
+    Returns:
+        list: List of names that don't start with ~$, ., or if the name is #recycle
+    """    
+    return [name for name in name_list if not any([name.startswith("~$"), name.startswith("."), name == "#recycle"])]
+
+
+def _get_exclude_hidden_func(exclude_hidden: bool=True) -> Callable:
+    """Return a function that processes a list of names based on whether hidden names should be included or excluded.
+
+    Args:
+        exclude_hidden (bool, optional): If True, return a function that excludes hidden names.
+            Else, return a function that simply returns its input list. Defaults to True.
+
+    Returns:
+        Callable: A function that takes a list of strings, and returns a list of strings. 
+            This function will exclude hidden files/directories if exclude_hidden is set to True.
+    """    
+    if exclude_hidden:
+        return _exclude_hidden
+    return lambda x: x 

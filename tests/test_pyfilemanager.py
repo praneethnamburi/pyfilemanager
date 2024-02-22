@@ -87,6 +87,18 @@ def test_add_exclude_str(tmp_path_factory):
     }
 
 
+def test_add_by_depth(tmp_path_factory):
+    fm = FileManager(tmp_path_factory.getbasetemp())
+    fm.add_by_depth()
+    assert list(fm._files.keys()) == ["files0"]
+    assert len(fm.all_files) == 0
+    fm.add_by_depth(max_depth=-1, include_directories=True)
+    assert len(fm["files1"]) == 13
+    assert "directories0" in fm._files
+    fm.add_by_depth(max_depth=-1, exclude_hidden=False)
+    assert len(fm["files1"]) > 13
+
+
 def test_tag_overwrite(tmp_path_factory):
     fm = FileManager(tmp_path_factory.getbasetemp())
     fm.add("notes", "notes*.txt")
@@ -170,6 +182,16 @@ def test_find(tmp_path_factory):
     )  # test case when path=None, not sure if this is a good test
     assert len(pyfilemanager.find("*.*", path=path, exclude_hidden=True)) == 13
     assert len(pyfilemanager.find("*.*", path=path, exclude_hidden=False)) > 13
+
+
+def test_find_by_depth(tmp_path_factory):
+    path = tmp_path_factory.getbasetemp()
+    dirs, files = pyfilemanager.find_by_depth(path, 0)
+    assert len(dirs[0]) == 5
+    assert len(files[0]) == 0
+    dirs, files = pyfilemanager.find_by_depth(path, -1)
+    assert len(dirs) == 2
+    assert len(files) == 2
 
 
 def test_get_file_sizes(tmp_path_factory):

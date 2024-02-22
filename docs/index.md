@@ -14,4 +14,5 @@
 self
 api
 demo
+clog
 ```

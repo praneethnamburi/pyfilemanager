@@ -15,9 +15,7 @@
 pip install pyfilemanager
 ```
 
-## Usage
-
-### Quickstart
+## Quickstart
 
 ```python
 from pyfilemanager import FileManager
@@ -26,7 +24,7 @@ fm.add('canon', '*Camera.avi', include='canon')
 video_list = fm['video']
 ```
 
-### Long version
+## Usage
 Consider the following directory structure
 
 ```
@@ -91,6 +89,11 @@ C:\videos
 
     fm.add('notes', 'notes*.txt', exclude=['sony', 'panasonic', 'panasonic2', 'canon'])
     # achieves the same result as the previous line
+
+    fm.add_by_depth(max_depth=1)
+    # creates the tags 'files0' and 'files1' (new in v1.1)
+    # files0 tag will contain paths for files in the base directory (0 entries)
+    # files1 tag will contain paths for files in the immediate sub-directories (13 entries)
     ```
 3. Retrieve file paths using a dict-like convention.
    ```python

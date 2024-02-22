@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Union
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __all__ = ["FileManager", "find"]
 
 

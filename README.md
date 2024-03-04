@@ -25,9 +25,13 @@ conda install conda-forge::pyfilemanager
 
 ```python
 from pyfilemanager import FileManager
-fm = FileManager(r'C:\videos')
+
+# one-liner to retrieve videos in the canon folder
+canon_videos = FileManager(r'C:\videos').add()['canon/*Camera.avi']
+
+# or, work with tags
 fm.add('canon', '*Camera.avi', include='canon')
-video_list = fm['video']
+canon_videos = fm['canon']
 ```
 
 ## Usage

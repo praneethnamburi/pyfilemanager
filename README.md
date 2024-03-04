@@ -11,8 +11,14 @@
 
 ## Installation
 
+`pyfilemanager` can be installed through pip or conda.
+
 ```sh
 pip install pyfilemanager
+
+# or
+
+conda install conda-forge::pyfilemanager
 ```
 
 ## Quickstart
